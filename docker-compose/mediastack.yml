@@ -1,0 +1,112 @@
+---
+version: '3'
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /home/dugi/dockers/portainer/config:/data
+    ports:
+      - 9000:9000
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+      - JELLYFIN_PublishedServerUrl=192.168.111.9
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/dri/card0:/dev/dri/card0
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    volumes:
+      - /home/dugi/dockers/jellyfin/config:/config
+      - /mnt/media/tvshows:/data/tvshows
+      - /mnt/media/clips:/data/clips
+      - /mnt/media/movies:/data/movies
+      - /mnt/media/music:/data/music
+    ports:
+      - 9001:8096
+      - 8920:8920  # optional
+      - 7359:7359/udp  # optional
+      - 1900:1900/udp  # optional
+    restart: unless-stopped
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+      - WEBUI_PORT=9002
+    volumes:
+      - /home/dugi/dockers/qbit/config:/config
+      - /home/dugi/dockers/qbit/downloads:/downloads
+    ports:
+      - 9981:6881
+      - 9981:6881/udp
+      - 9002:9002
+    restart: unless-stopped
+
+  soulseek:
+    image: realies/soulseek
+    container_name: slsk
+    environment:
+      - PGID=1000
+      - PUID=1000
+    ports:
+      - 9003:6080
+    volumes:
+      - /home/dugi/dockers/slsk/appdata:/data/.SoulseekQt
+      - /mnt/media/music:/data/Soulseek Downloads
+      - /mnt/media/music:/data/Soulseek Shared Folder
+      - /home/dugi/dockers/slsk/logs:/data/Soulseek Chat Logs
+    restart: unless-stopped
+
+  npm:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: npm
+    ports:
+      - 9004:80
+      - 3081:81
+      - 9005:443
+    environment:
+      - DB_MYSQL_HOST=db
+      - DB_MYSQL_PORT=3306
+      - DB_MYSQL_USER=npm
+      - DB_MYSQL_PASSWORD=npm
+      - DB_MYSQL_NAME=npm
+      - TZ=Europe/Madrid
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /home/dugi/dockers/npm/data:/data
+      - /home/dugi/dockers/npm/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - db
+
+  db:
+    image: 'jc21/mariadb-aria:latest'
+    container_name: db
+    environment:
+      - MYSQL_ROOT_PASSWORD=npm
+      - MYSQL_DATABASE=npm
+      - MYSQL_USER=npm
+      - MYSQL_PASSWORD=npm
+    volumes:
+      - /home/dugi/dockers/npm/db:/var/lib/mysql
+
+networks:
+  default:
+    external:
+      name: nginx_proxy

@@ -1,0 +1,49 @@
+---
+- hosts: all
+  vars_prompt:
+    - name: "ansible_ssh_pass"
+      prompt: "SSH password"
+      private: yes
+  tasks:
+    - name: Update package manager cache
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install prerequisites on Proxmox
+      shell: |
+        # Code to install packages on Proxmox
+      when: "'mainframe' in group_names"
+
+- hosts: devweb
+  tasks:
+    - name: Install packages on Ubuntu
+      apt:
+        name:
+          - vim
+          - bashtop
+          - neofetch
+          - lm-sensors
+        state: present
+
+- hosts: mainframe
+  tasks:
+    - name: Install packages on Proxmox
+      apt:
+        name:
+          - vim
+          - bashtop
+          - neofetch
+          - lm-sensors
+        state: present
+
+- hosts: div1
+  tasks:
+    - name: Install packages on Endeavouros
+      pacman:
+        name:
+          - vim
+          - btop
+          - neofetch
+          - lm_sensors
+        state: present
