@@ -81,6 +81,21 @@ echo "alias pacupd='sudo pacman -Syyuu'" >> /home/dugi/.bashrc
 echo "alias pac='sudo pacman -S --noconfirm'" >> /home/dugi/.bashrc
 echo "alias ip='ip -c a'" >> /home/dugi/.bashrc
 echo -e "Aliases added"
+alias va='ls -lrtha --color=auto'
+alias p='pwd'
+alias c='clear'
+alias rmr='sudo rm -R'
+alias rmf='sudo rm'
+alias v='ls -lrth --color=auto'
+alias shutd='sudo shutdown -h now'
+alias reboot='sudo systemctl reboot'
+alias pacupd='sudo apt update -y && sudo apt upgrade -y'
+alias pac='sudo apt install -y'
+alias ip='ip -c a'
+alias bat='acpi -b'
+alias vr='ls -ltr'
+
+export PS1='\[\e[1;37m\]\[\e[1;35m\]╭──[\[\e[1;37m\]\t\[\e[1;35m\]]\n╰──(\[\e[0;33m\]\u\[\e[1;35m\]@\[\e[0;33m\]omv\[\e[1;35m\])-[\[\e[0;36m\]\w\[\e[1;35m\]]\$ '
 
 git config --global user.name "div1spawncamper"
 git config --global user.email doogie17@gmail.com
